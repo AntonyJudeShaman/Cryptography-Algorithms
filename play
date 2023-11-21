@@ -1,0 +1,91 @@
+#include <stdio.h> 
+#include <string.h> 
+#include <ctype.h> 
+#define SIZE 5 
+void gen(char key[], char Table[SIZE][SIZE]) { 
+int used[26] = {0}; 
+int row = 0, col = 0; 
+for (int i = 0; i < strlen(key); i++) { 
+if (used[key[i] - 'A'] == 0) { 
+Table[row][col] = key[i]; 
+used[key[i] - 'A'] = 1; 
+col++; 
+if (col == SIZE) { 
+col = 0; 
+row++; 
+} 
+} 
+} 
+for (char c = 'A'; c <= 'Z'; c++) {
+if (c != 'J' && used[c - 'A'] == 0) { 
+Table[row][col] = c; 
+col++; 
+if (col == SIZE) { 
+col = 0; 
+row++; 
+} 
+} 
+} 
+} 
+void search(char Table[SIZE][SIZE], char a, char b, int *row1, int *col1, int *row2, int *col2) { for (int i = 0; i < SIZE; i++) { 
+for (int j = 0; j < SIZE; j++) { 
+if (Table[i][j] == a) { 
+*row1 = i; 
+*col1 = j; 
+} 
+if (Table[i][j] == b) { 
+*row2 = i; 
+*col2 = j; 
+} 
+} 
+} 
+} 
+void encrypt(char Table[SIZE][SIZE], char plaintext[], char ciphertext[]) { for (int i = 0; i < strlen(plaintext); i += 2) { 
+int row1, col1, row2, col2; 
+search(Table, plaintext[i], plaintext[i + 1], &row1, &col1, &row2, &col2); 
+if (row1 == row2) { 
+ciphertext[i] = Table[row1][(col1 + 1) % SIZE]; 
+ciphertext[i + 1] = Table[row2][(col2 + 1) % SIZE]; 
+} else if (col1 == col2) { 
+ciphertext[i] = Table[(row1 + 1) % SIZE][col1]; 
+ciphertext[i + 1] = Table[(row2 + 1) % SIZE][col2]; 
+} else { 
+ciphertext[i] = Table[row1][col2]; 
+ciphertext[i + 1] = Table[row2][col1]; 
+} 
+} 
+ciphertext[strlen(plaintext)] = '\0'; 
+}
+void decrypt(char Table[SIZE][SIZE], char ciphertext[], char decrypted[]) { for (int i = 0; i < strlen(ciphertext); i += 2) { 
+int row1, col1, row2, col2; 
+search(Table, ciphertext[i], ciphertext[i + 1], &row1, &col1, &row2, &col2); 
+if (row1 == row2) { 
+decrypted[i] = Table[row1][(col1 - 1 + SIZE) % SIZE]; 
+decrypted[i + 1] = Table[row2][(col2 - 1 + SIZE) % SIZE]; 
+} else if (col1 == col2) { 
+decrypted[i] = Table[(row1 - 1 + SIZE) % SIZE][col1]; 
+decrypted[i + 1] = Table[(row2 - 1 + SIZE) % SIZE][col2]; 
+} else { 
+decrypted[i] = Table[row1][col2]; 
+decrypted[i + 1] = Table[row2][col1]; 
+} 
+} 
+decrypted[strlen(ciphertext)] = '\0'; 
+} 
+int main() { 
+char key[] = "key"; 
+char keyTable[SIZE][SIZE]; 
+gen(key, keyTable); 
+char plaintext[] = "helloworld"; 
+char ciphertext[strlen(plaintext)]; 
+char decrypted[strlen(plaintext)]; 
+for (int i = 0; i < strlen(plaintext); i++) { 
+plaintext[i] = toupper(plaintext[i]); 
+} 
+encrypt(keyTable, plaintext, ciphertext); 
+decrypt(keyTable, ciphertext, decrypted); 
+printf("Plaintext: %s\n", plaintext); 
+printf("Encrypted: %s\n", ciphertext); 
+printf("Decrypted: %s\n", decrypted); 
+return 0; 
+}
