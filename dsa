@@ -1,0 +1,50 @@
+from Crypto.PublicKey import DSA
+from Crypto.Signature import DSS
+from Crypto.Hash import SHA1
+
+def generate_dsa_signature(p, q, g, private_key, message):
+    sha1_hash = SHA1.new(message.encode('utf-8'))
+    k = int(input("Enter k (0 < k < q): "))
+    r = pow(g, k, p) % q
+    k_inv = pow(k, -1, q)
+    s = (k_inv * (int(sha1_hash.hexdigest(), 16) + private_key * r)) % q
+    return r, s
+
+def verify_dsa_signature(p, q, g, public_key, message, received_r, received_s):
+    sha1_hash = SHA1.new(message.encode('utf-8'))
+    received_r_prime = int(input("Enter r' value: "))
+    received_s_prime = int(input("Enter s' value: "))
+    
+    if 0 < received_r_prime < q and 0 < received_s_prime < q:
+        w = pow(received_s_prime, -1, q)
+        u1 = (int(sha1_hash.hexdigest(), 16) * w) % q
+        u2 = (received_r_prime * w) % q
+        v = (pow(g, u1, p) * pow(public_key, u2, p)) % p % q
+        
+        if v == received_r_prime:
+            return True
+    return False
+
+def main():
+    prime_number = int(input("Enter p: "))
+    divisor = int(input("Enter q: "))
+    base = int(input("Enter H: "))
+    temp = (prime_number - 1) // divisor
+    generator = pow(base, temp, prime_number)
+    print("Generator g:", generator)
+    
+    private_key = int(input("Enter x (0 < x < q): "))
+    public_key = pow(generator, private_key, prime_number)
+    print("Public Key y:", public_key)
+    
+    message = input("Enter a plaintext: ")
+    signature_r, signature_s = generate_dsa_signature(prime_number, divisor, generator, private_key, message)
+    print("Generated Signature (r, s):", signature_r, signature_s)
+    
+    if verify_dsa_signature(prime_number, divisor, generator, public_key, message, signature_r, signature_s):
+        print("Signature is valid.")
+    else:
+        print("Signature is not valid.")
+
+if __name__ == "__main__":
+    main()
