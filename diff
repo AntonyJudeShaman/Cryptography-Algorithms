@@ -1,0 +1,23 @@
+def main(): 
+p = int(input("Enter the number: ")) 
+alpha = int(input("Enter the alpha: ")) 
+pa = int(input("Enter the Private Key A: ")) 
+pb = int(input("Enter the Private Key B: ")) 
+pua = power(alpha, pa, p) 
+pub = power(alpha, pb, p) 
+print("Public Key A:", pua) 
+print("Public Key B:", pub) 
+k1 = power(pub, pa, p) 
+k2 = power(pua, pb, p) 
+print("Key 1:", k1) 
+print("Key 2:", k2)
+def power(a, b, n): 
+m = a 
+while b > 1: 
+b -= 1 
+m = m * a 
+if m > n: 
+m = m % n 
+return m 
+if __name__ == "__main__": 
+main() 
