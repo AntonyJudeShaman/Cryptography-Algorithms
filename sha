@@ -1,0 +1,15 @@
+import hashlib 
+def main(): 
+inputs = ["Antony", "Jude", "Shaman"] 
+for input_str in inputs: 
+try: 
+sha1_hash = hashlib.sha1(input_str.encode()).digest() 
+hex_hash = bytes_to_hex(sha1_hash) 
+print(f'SHA1("{input_str}") = {hex_hash}') 
+except Exception as e: 
+print(f'Exception: {e}') 
+def bytes_to_hex(bytes):
+hex_string = ''.join(format(b, '02X') for b in bytes) 
+return hex_string 
+if __name__ == "__main__": 
+main()
